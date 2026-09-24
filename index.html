@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="manifest.json">
+<title>Gestion Stock</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div>
+    <h1>Gestion Stock</h1>
+    <p>Gestion de marchandises</p>
+  </div>
+  <button id="installBtn" class="secondary hidden">Installer</button>
+</header>
+
+<main>
+  <section class="dashboard">
+    <div class="card"><span>Produits</span><strong id="countProducts">0</strong></div>
+    <div class="card"><span>Unités en stock</span><strong id="totalUnits">0</strong></div>
+    <div class="card"><span>Valeur du stock</span><strong id="stockValue">0,00 €</strong></div>
+    <div class="card alert"><span>Stock faible</span><strong id="lowStock">0</strong></div>
+  </section>
+
+  <section class="panel">
+    <div class="toolbar">
+      <input id="search" placeholder="Rechercher un produit..." />
+      <button id="addBtn">+ Ajouter un produit</button>
+    </div>
+    <div class="tableWrap">
+      <table>
+        <thead><tr>
+          <th>Produit</th><th>Référence</th><th>Catégorie</th><th>Stock</th>
+          <th>Seuil</th><th>Prix achat</th><th>Valeur</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="productsBody"></tbody>
+      </table>
+    </div>
+    <div id="empty" class="empty">Aucun produit. Clique sur « Ajouter un produit ».</div>
+  </section>
+</main>
+
+<div id="modal" class="modal hidden">
+  <div class="modalBox">
+    <div class="modalHead"><h2 id="modalTitle">Ajouter un produit</h2><button id="closeBtn">×</button></div>
+    <form id="productForm">
+      <input type="hidden" id="productId">
+      <label>Nom du produit<input id="name" required></label>
+      <label>Référence<input id="ref"></label>
+      <label>Catégorie<input id="category"></label>
+      <div class="grid2">
+        <label>Quantité<input id="qty" type="number" min="0" value="0" required></label>
+        <label>Seuil d'alerte<input id="threshold" type="number" min="0" value="5" required></label>
+      </div>
+      <div class="grid2">
+        <label>Prix d'achat unitaire (€)<input id="buyPrice" type="number" min="0" step="0.01" value="0"></label>
+        <label>Prix de vente (€)<input id="sellPrice" type="number" min="0" step="0.01" value="0"></label>
+      </div>
+      <label>Emplacement<input id="location" placeholder="Ex : Étagère A1"></label>
+      <label>Notes<textarea id="notes" rows="3"></textarea></label>
+      <div class="formActions"><button type="button" id="cancelBtn" class="secondary">Annuler</button><button type="submit">Enregistrer</button></div>
+    </form>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
