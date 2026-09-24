@@ -1,39 +1,13 @@
-const KEY="gestion_stock_v1";
-let products=JSON.parse(localStorage.getItem(KEY)||"[]");
-const $=id=>document.getElementById(id);
-const money=n=>Number(n||0).toLocaleString("fr-FR",{style:"currency",currency:"EUR"});
+const KEY="gestion_stock_v2";let products=[];try{products=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){products=[]}
+const $=id=>document.getElementById(id);const money=n=>Number(n||0).toLocaleString("fr-FR",{style:"currency",currency:"EUR"});
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 function save(){localStorage.setItem(KEY,JSON.stringify(products));render()}
-function render(){
- const q=$("search").value.toLowerCase();
- const list=products.filter(p=>(p.name+" "+p.ref+" "+p.category).toLowerCase().includes(q));
- $("productsBody").innerHTML=list.map(p=>`<tr>
- <td><b>${esc(p.name)}</b>${p.location?`<small> · ${esc(p.location)}</small>`:""}</td>
- <td>${esc(p.ref||"—")}</td><td>${esc(p.category||"—")}</td>
- <td class="${p.qty<=p.threshold?"low":"ok"}">${p.qty}</td><td>${p.threshold}</td>
- <td>${money(p.buyPrice)}</td><td>${money(p.qty*p.buyPrice)}</td>
- <td class="actions"><button onclick="movement('${p.id}',1)">+ Stock</button><button onclick="movement('${p.id}',-1)">− Stock</button><button onclick="edit('${p.id}')" class="secondary">Modifier</button><button onclick="removeP('${p.id}')" class="danger">Suppr.</button></td>
- </tr>`).join("");
- $("empty").style.display=list.length?"none":"block";
- $("countProducts").textContent=products.length;
- $("totalUnits").textContent=products.reduce((s,p)=>s+Number(p.qty),0);
- $("stockValue").textContent=money(products.reduce((s,p)=>s+p.qty*p.buyPrice,0));
- $("lowStock").textContent=products.filter(p=>p.qty<=p.threshold).length;
-}
-function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function openModal(p=null){
- $("modalTitle").textContent=p?"Modifier un produit":"Ajouter un produit";
- $("productId").value=p?.id||"";$("name").value=p?.name||"";$("ref").value=p?.ref||"";$("category").value=p?.category||"";
- $("qty").value=p?.qty??0;$("threshold").value=p?.threshold??5;$("buyPrice").value=p?.buyPrice??0;$("sellPrice").value=p?.sellPrice??0;
- $("location").value=p?.location||"";$("notes").value=p?.notes||"";$("modal").classList.remove("hidden");
-}
-function closeModal(){$("modal").classList.add("hidden")}
-function edit(id){openModal(products.find(p=>p.id===id))}
-function removeP(id){if(confirm("Supprimer ce produit ?")){products=products.filter(p=>p.id!==id);save()}}
-function movement(id,delta){const p=products.find(p=>p.id===id);if(!p)return;const n=p.qty+delta;if(n<0)return alert("Stock insuffisant.");p.qty=n;save()}
+function render(){const q=$("search").value.toLowerCase();const list=products.filter(p=>(p.name+" "+p.ref+" "+p.category).toLowerCase().includes(q));
+$("productsBody").innerHTML=list.map(p=>`<tr><td><b>${esc(p.name)}</b>${p.location?`<small>📍 ${esc(p.location)}</small>`:""}</td><td>${esc(p.ref||"—")}</td><td>${esc(p.category||"—")}</td><td class="${p.qty<=p.threshold?"stockLow":"stockOk"}">${p.qty}</td><td>${p.threshold}</td><td>${money(p.buyPrice)}</td><td>${money(p.qty*p.buyPrice)}</td><td class="actions"><button class="primary" onclick="movement('${p.id}',1)">+1</button><button class="secondary" onclick="movement('${p.id}',-1)">−1</button><button class="secondary" onclick="editProduct('${p.id}')">Modifier</button><button class="danger" onclick="removeProduct('${p.id}')">Suppr.</button></td></tr>`).join("");
+$("empty").style.display=list.length?"none":"block";$("countProducts").textContent=products.length;$("totalUnits").textContent=products.reduce((s,p)=>s+Number(p.qty),0);$("stockValue").textContent=money(products.reduce((s,p)=>s+Number(p.qty)*Number(p.buyPrice),0));$("lowStock").textContent=products.filter(p=>p.qty<=p.threshold).length}
+function openModal(p){$("modalTitle").textContent=p?"Modifier un produit":"Ajouter un produit";$("productId").value=p?.id||"";$("name").value=p?.name||"";$("ref").value=p?.ref||"";$("category").value=p?.category||"";$("qty").value=p?.qty??0;$("threshold").value=p?.threshold??5;$("buyPrice").value=p?.buyPrice??0;$("sellPrice").value=p?.sellPrice??0;$("location").value=p?.location||"";$("notes").value=p?.notes||"";$("modal").classList.remove("hidden")}
+function closeModal(){$("modal").classList.add("hidden")}function editProduct(id){openModal(products.find(p=>p.id===id))}
+function removeProduct(id){if(confirm("Supprimer ce produit ?")){products=products.filter(p=>p.id!==id);save()}}
+function movement(id,d){const p=products.find(p=>p.id===id);if(!p)return;if(p.qty+d<0){alert("Stock insuffisant.");return}p.qty+=d;save()}
 $("addBtn").onclick=()=>openModal();$("closeBtn").onclick=closeModal;$("cancelBtn").onclick=closeModal;$("search").oninput=render;
-$("productForm").onsubmit=e=>{e.preventDefault();const id=$("productId").value;const data={id:id||crypto.randomUUID(),name:$("name").value.trim(),ref:$("ref").value.trim(),category:$("category").value.trim(),qty:+$("qty").value,threshold:+$("threshold").value,buyPrice:+$("buyPrice").value,sellPrice:+$("sellPrice").value,location:$("location").value.trim(),notes:$("notes").value.trim()};if(!data.name)return;
- const i=products.findIndex(p=>p.id===data.id);if(i>=0)products[i]=data;else products.push(data);save();closeModal()};
-if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
-let deferredPrompt;$("installBtn").onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null}};
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").classList.remove("hidden")});
-render();
+$("productForm").onsubmit=e=>{e.preventDefault();const id=$("productId").value;const p={id:id||Date.now().toString(),name:$("name").value.trim(),ref:$("ref").value.trim(),category:$("category").value.trim(),qty:Number($("qty").value),threshold:Number($("threshold").value),buyPrice:Number($("buyPrice").value),sellPrice:Number($("sellPrice").value),location:$("location").value.trim(),notes:$("notes").value.trim()};if(!p.name){alert("Le nom du produit est obligatoire.");return}const i=products.findIndex(x=>x.id===p.id);i>=0?products[i]=p:products.push(p);save();closeModal()};render();

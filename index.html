@@ -3,69 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#111827">
+<meta name="theme-color" content="#172033">
+<title>Gestion Stock Marchandise</title>
 <link rel="manifest" href="manifest.json">
-<title>Gestion Stock</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-  <div>
-    <h1>Gestion Stock</h1>
-    <p>Gestion de marchandises</p>
-  </div>
-  <button id="installBtn" class="secondary hidden">Installer</button>
+<header class="top">
+  <div class="brand"><div class="logo">📦</div><div><h1>Gestion Stock</h1><p>Gestion de marchandises</p></div></div>
+  <button id="addBtn" class="primary">＋ Ajouter un produit</button>
 </header>
 
 <main>
-  <section class="dashboard">
-    <div class="card"><span>Produits</span><strong id="countProducts">0</strong></div>
-    <div class="card"><span>Unités en stock</span><strong id="totalUnits">0</strong></div>
-    <div class="card"><span>Valeur du stock</span><strong id="stockValue">0,00 €</strong></div>
-    <div class="card alert"><span>Stock faible</span><strong id="lowStock">0</strong></div>
+  <section class="stats">
+    <article><span>📦 Produits</span><b id="countProducts">0</b></article>
+    <article><span>🔢 Unités en stock</span><b id="totalUnits">0</b></article>
+    <article><span>💰 Valeur du stock</span><b id="stockValue">0,00 €</b></article>
+    <article class="warning"><span>⚠️ Stocks faibles</span><b id="lowStock">0</b></article>
   </section>
 
   <section class="panel">
-    <div class="toolbar">
-      <input id="search" placeholder="Rechercher un produit..." />
-      <button id="addBtn">+ Ajouter un produit</button>
+    <div class="panelTitle">
+      <div><h2>Mes marchandises</h2><p>Ajoute tes produits et suis les quantités disponibles.</p></div>
+      <input id="search" type="search" placeholder="🔎 Rechercher..." aria-label="Rechercher un produit">
     </div>
     <div class="tableWrap">
       <table>
-        <thead><tr>
-          <th>Produit</th><th>Référence</th><th>Catégorie</th><th>Stock</th>
-          <th>Seuil</th><th>Prix achat</th><th>Valeur</th><th>Actions</th>
-        </tr></thead>
+        <thead><tr><th>Produit</th><th>Référence</th><th>Catégorie</th><th>Stock</th><th>Seuil</th><th>Prix achat</th><th>Valeur</th><th>Actions</th></tr></thead>
         <tbody id="productsBody"></tbody>
       </table>
     </div>
-    <div id="empty" class="empty">Aucun produit. Clique sur « Ajouter un produit ».</div>
+    <div id="empty" class="empty">
+      <div class="emptyIcon">📦</div>
+      <h3>Aucun produit enregistré</h3>
+      <p>Commence par ajouter ta première marchandise.</p>
+      <button class="primary" onclick="openModal()">＋ Ajouter un produit</button>
+    </div>
   </section>
 </main>
 
 <div id="modal" class="modal hidden">
-  <div class="modalBox">
-    <div class="modalHead"><h2 id="modalTitle">Ajouter un produit</h2><button id="closeBtn">×</button></div>
-    <form id="productForm">
-      <input type="hidden" id="productId">
-      <label>Nom du produit<input id="name" required></label>
-      <label>Référence<input id="ref"></label>
-      <label>Catégorie<input id="category"></label>
-      <div class="grid2">
-        <label>Quantité<input id="qty" type="number" min="0" value="0" required></label>
-        <label>Seuil d'alerte<input id="threshold" type="number" min="0" value="5" required></label>
-      </div>
-      <div class="grid2">
-        <label>Prix d'achat unitaire (€)<input id="buyPrice" type="number" min="0" step="0.01" value="0"></label>
-        <label>Prix de vente (€)<input id="sellPrice" type="number" min="0" step="0.01" value="0"></label>
-      </div>
-      <label>Emplacement<input id="location" placeholder="Ex : Étagère A1"></label>
-      <label>Notes<textarea id="notes" rows="3"></textarea></label>
-      <div class="formActions"><button type="button" id="cancelBtn" class="secondary">Annuler</button><button type="submit">Enregistrer</button></div>
-    </form>
-  </div>
+ <div class="modalBox">
+  <div class="modalHead"><div><h2 id="modalTitle">Ajouter un produit</h2><p>Renseigne les informations de la marchandise.</p></div><button id="closeBtn" class="close">×</button></div>
+  <form id="productForm">
+   <input type="hidden" id="productId">
+   <label>Nom du produit *<input id="name" required placeholder="Ex : Souris gaming"></label>
+   <div class="grid2">
+    <label>Référence<input id="ref" placeholder="Ex : SG-001"></label>
+    <label>Catégorie<input id="category" placeholder="Ex : Gaming"></label>
+   </div>
+   <div class="grid2">
+    <label>Quantité<input id="qty" type="number" min="0" value="0" required></label>
+    <label>Seuil d'alerte<input id="threshold" type="number" min="0" value="5" required></label>
+   </div>
+   <div class="grid2">
+    <label>Prix d'achat unitaire (€)<input id="buyPrice" type="number" min="0" step="0.01" value="0"></label>
+    <label>Prix de vente (€)<input id="sellPrice" type="number" min="0" step="0.01" value="0"></label>
+   </div>
+   <label>Emplacement<input id="location" placeholder="Ex : Étagère A1"></label>
+   <label>Notes<textarea id="notes" rows="3" placeholder="Informations complémentaires..."></textarea></label>
+   <div class="formActions"><button type="button" id="cancelBtn" class="secondary">Annuler</button><button class="primary" type="submit">Enregistrer</button></div>
+  </form>
+ </div>
 </div>
-
 <script src="app.js"></script>
 </body>
 </html>
